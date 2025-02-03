@@ -1,7 +1,7 @@
 *{
     background-color: aquamarine;
     font-family: sans-serif;
-    font-size: 12px;
+    font-size: 18px;
 }
 
 #classes{
@@ -18,6 +18,34 @@
     ;
 
 
+}
+
+#class1{
+    grid-area: cl1;
+    width: 100px;
+    height: 50px;
+    background: blue;
+}
+
+#class2{
+    grid-area: cl2;
+    width: 100px;
+    height: 50px;
+    background: blue;
+}
+
+#class3{
+    grid-area: cl3;
+    width: 100px;
+    height: 50px;
+    background: blue;
+}
+
+#class4{
+    grid-area: cl4;
+    width: 100px;
+    height: 50px;
+    background: blue;
 }
 
 
