@@ -13,6 +13,9 @@ get('/login') do
 end
 
 get('/classes') do
-    slim(:classes)
+    slim(:"classes/")
 end
 
+get('/classes/new') do
+    slim(:create)
+end

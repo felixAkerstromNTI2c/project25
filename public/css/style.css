@@ -3,7 +3,20 @@
     font-family: sans-serif;
     font-size: 18px;
 }
+#main_menu{
+    list-style: none;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background:rgb(228, 202, 164);
+}
 
+#log_in_menu_bar{
+    background:rgb(228, 202, 164);
+}
+#my_classes_menu_bar{
+    background:rgb(228, 202, 164);
+}
 #classes{
     font-size: 16px;
 
@@ -49,4 +62,48 @@
 }
 
 
+#grid_wrapper_start{
+    display: grid;
+    display: flex;
+    justify-content: space-around;
+    grid-template-areas: 
+    "log account"
+    
+    ;
 
+
+}
+
+
+#log_in_button{
+    background: rgb(89, 202, 164);
+    grid-area: log;
+    display:flex;
+    justify-content:center;
+    align-items: center;
+    width: 150px;
+    height:70px;
+    text-decoration: none;
+    color: black;
+
+}
+#account_button{
+    background: rgb(89, 202, 164);
+    grid-area: account;
+    display:flex;
+    justify-content:center;
+    align-items: center;
+    width: 150px;
+    height:70px;
+    text-decoration: none;
+    color: black;
+
+}
+
+#log_in_button:hover{
+    background: rgb(80, 170, 140);
+}
+
+#account_button:hover{
+    background: rgb(80, 170, 140);
+}
