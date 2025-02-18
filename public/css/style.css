@@ -25,12 +25,17 @@
 #grid_wrapper_classes{
     display: grid;
     grid-template-areas: 
-    "cl1 cl2 "
+    "cl1 cl2"
     "cl3 cl4"
+    "ncl ."
     
     ;
-
-
+}
+#new_class{
+    grid-area: ncl;
+    width: 100px;
+    height: 50px;
+    background: red;
 }
 
 #class1{
