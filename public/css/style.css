@@ -13,16 +13,19 @@
 
 #log_in_menu_bar{
     background:rgb(228, 202, 164);
+    font-size: 2rem;
+    text-decoration: none;
+    color: black;
 }
 #my_classes_menu_bar{
     background:rgb(228, 202, 164);
+    font-size: 2rem;
+    text-decoration: none;
+    color: black;
 }
-#classes{
-    font-size: 16px;
 
-}
 
-#grid_wrapper_classes{
+/* #grid_wrapper_classes{
     display: grid;
     grid-template-areas: 
     "cl1 cl2"
@@ -30,22 +33,66 @@
     "ncl ."
     
     ;
+} */
+
+#grid_wrapper_classes{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    /* display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 100px auto;
+    grid-template-areas:
+    "ncl"
+    "cli"
+    ; */
 }
+    
+/* #grid_wrapper_classes a{
+    text-decoration: none;
+    color: black;
+} */
 #new_class{
     grid-area: ncl;
+    margin: 10px;
     width: 100px;
-    height: 50px;
+    height: 100px;
     background: red;
+    text-decoration: none;
+    color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-#class1{
+/* #class1{
     grid-area: cl1;
     width: 100px;
     height: 50px;
     background: blue;
+} */
+
+.class_icon{
+    grid-area: cli;
+    width: 100px;
+    height: 100px;
+    background: blue;
+    border: 2px solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+    text-decoration: none;
+    color: black;
+    
+}
+.class_icon:hover{
+    background: rgb(80, 170, 140);
 }
 
-#class2{
+/* #class2{
     grid-area: cl2;
     width: 100px;
     height: 50px;
@@ -64,7 +111,7 @@
     width: 100px;
     height: 50px;
     background: blue;
-}
+} */
 
 
 #grid_wrapper_start{

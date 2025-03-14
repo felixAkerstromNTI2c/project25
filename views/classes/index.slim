@@ -1,11 +1,9 @@
 
 div#grid_wrapper_classes
-    h2#classes My classes
+
     
-    a#new_class href="/classes/new" 
+    a#new_class href="/classes/new" New class
 
-
-    a#class1 href=""
-    a#class2 href=""
-    a#class3 href=""
-    a#class4 href=""
+    - groups.each do |group|
+        a href=""
+            p.class_icon = group["groupname"]

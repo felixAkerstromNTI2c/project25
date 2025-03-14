@@ -18,7 +18,11 @@ get('/login') do
 end
 
 get('/classes') do
-    slim(:"classes/index")
+  	db = SQLite3::Database.new("db/database.db")
+	db.results_as_hash = true
+	groups = db.execute("SELECT * FROM 'group' WHERE userid = #{session[:id]}")
+
+    slim(:"classes/index", locals:{groups:groups})
 end
 
 get('/classes/new') do
@@ -26,10 +30,11 @@ get('/classes/new') do
 end
 
 post('/classes/new') do
-    groupname = params[:groupname]
-    db = SQLite3::Database.new("db/database.db")
-    db.execute("INSERT INTO 'group' (groupname, userid) VALUES (?,?)", [groupname,userid])
-    redirect('/classes')
+	userid = session[:id]
+	groupname = params[:groupname]
+	db = SQLite3::Database.new("db/database.db")
+	db.execute("INSERT INTO 'group' (groupname, userid) VALUES (?,?)", [groupname,userid])
+	redirect('/classes')
 end
 
 post('/login') do
@@ -37,7 +42,11 @@ post('/login') do
     password = params[:password]
     db = SQLite3::Database.new('db/database.db')
     db.results_as_hash = true
-    result = db.execute("SELECT * FROM users WHERE name = ?",name).first
+    #result = db.execute("SELECT * FROM 'users'")
+    #p result
+    #p username
+    result = db.execute("SELECT * FROM users WHERE name = (?)",[username]).first
+    #p result
     pwdigest = result["pwdigest"]
     id = result["id"]
   
@@ -52,17 +61,18 @@ end
 
 
 post('/create_account') do
+  adminlevel = 1
   name = params[:username]
   password = params[:password]
-  password_confirm = params[:confirm_passsword]
+  password_confirm = params[:confirm_password]
   if password == password_confirm
     password_digest = BCrypt::Password.create(password)
     db = SQLite3::Database.new('db/database.db')
-    db.execute("INSERT INTO users (name,pwdigest) VALUES (?,?)",[name, password_digest])
+    db.execute("INSERT INTO 'users' (name,pwdigest,adminlevel) VALUES (?,?,?)",[name, password_digest,adminlevel])
     redirect('/')
   else
-
-    "Lösenorden matchade inte!"
+    
+    "Lösenorden matchade inte! #{password} #{password_confirm}"
   end
 end
 
