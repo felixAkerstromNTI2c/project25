@@ -18,15 +18,27 @@ get('/login') do
 end
 
 get('/classes') do
-  	db = SQLite3::Database.new("db/database.db")
+  db = SQLite3::Database.new("db/database.db")
 	db.results_as_hash = true
 	groups = db.execute("SELECT * FROM 'group' WHERE userid = #{session[:id]}")
 
     slim(:"classes/index", locals:{groups:groups})
 end
 
+get('/class_members') do
+  db = SQLite3::Database.new("db/database.db")
+  db.results_as_hash = true
+  members = db.execute("SELECT * FROM 'member_names'")
+
+  slim(:"class_members/index", locals:{members:members})
+end
+
 get('/classes/new') do
     slim(:"classes/new")
+end
+
+get('/classes/edit') do
+  slim(:"classes/edit")
 end
 
 post('/classes/new') do
@@ -37,28 +49,42 @@ post('/classes/new') do
 	redirect('/classes')
 end
 
+post('/class_members/new') do
+  fullname = params[:fullname]
+  groupid = params[:groupid]
+  db = SQLite3::Database.new("db/database.db")
+  db.execute("INSERT INTO 'member_names' (fullname, groupid) VALUES (?,?)", [fullname, groupid])
+  redirect('/class_members')
+end
+
 post('/login') do
-    username = params[:username]
-    password = params[:password]
-    db = SQLite3::Database.new('db/database.db')
-    db.results_as_hash = true
-    #result = db.execute("SELECT * FROM 'users'")
-    #p result
-    #p username
-    result = db.execute("SELECT * FROM users WHERE name = (?)",[username]).first
-    #p result
+  username = params[:username]
+  password = params[:password]
+  db = SQLite3::Database.new('db/database.db')
+  db.results_as_hash = true
+  result = db.execute("SELECT * FROM users WHERE name = (?)", [username]).first
+
+  if result.nil?
+    "WRONG USERNAME!"
+  else
     pwdigest = result["pwdigest"]
     id = result["id"]
-  
+
     if BCrypt::Password.new(pwdigest) == password
       session[:id] = id
+      session[:username] = username
       redirect('/classes')
     else
       "WRONG PASSWORD!"
     end
+  end
+end
+
+get('/logout') do
+  session.clear
+  redirect('/')
 end
   
-
 
 post('/create_account') do
   adminlevel = 1
@@ -76,6 +102,11 @@ post('/create_account') do
   end
 end
 
+get('/group/:id') do
+
+
+
+end
 
 
 

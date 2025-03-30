@@ -7,13 +7,13 @@ html lang="en"
         link rel="stylesheet" href="/css/style.css"/
     body 
 
-    h1 Hello
+    h1#user_greeting Hello #{session[:username]}
 
     ul#main_menu
-        li
+        li#log_in_li
             a#log_in_menu_bar href="/login" Log in
-        li
-            a#my_classes_menu_bar href="/my_classes" My Classes
+        li#log_out_li
+            a#logout_menu_bar href="/logout" Log out
 
     section 
         == yield
