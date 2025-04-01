@@ -1,0 +1,12 @@
+div#grid_wrapper_members
+
+    a#back_to_classes href="/classes" Back to classes
+
+
+    -  members.each do |member|
+        p.member_icon = member['fullname']
+
+    form action="/class_members/create" method="post"
+        input type="text" name="fullname" placeholder="The name"
+        input type="hidden" name="group_id" value=group_id
+        input type="submit" value="Add member"

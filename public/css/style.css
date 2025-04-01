@@ -69,6 +69,11 @@
     "cli"
     ; */
 }
+#grid_wrapper_members{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
     
 /* #grid_wrapper_classes a{
     text-decoration: none;
@@ -91,6 +96,23 @@
 #new_class:hover{
     background:rgb(247, 160, 31);
 }
+#new_member{
+    grid-area: ncl;
+    margin: 10px;
+    width: 100px;
+    height: 100px;
+    background: red;
+    text-decoration: none;
+    color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid black;
+    box-sizing: border-box;
+}
+#new_member:hover{
+    background:rgb(247, 160, 31);
+}
 /* #class1{
     grid-area: cl1;
     width: 100px;
@@ -98,7 +120,7 @@
     background: blue;
 } */
 
-.class_icon{
+.class_icon {
     grid-area: cli;
     width: 100px;
     height: 100px;
@@ -106,16 +128,49 @@
     border: 2px solid black;
     box-sizing: border-box;
     display: flex;
-    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     margin: 10px;
     text-decoration: none;
     color: black;
-    
 }
 .class_icon:hover{
     background: rgb(80, 170, 140);
+}
+.member_icon{
+    width: 240px;
+    height: 30px;
+    background: rgb(80, 170, 140);
+    border: 2px solid black;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2px;
+    text-decoration: none;
+    color: black;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+    
+}
+
+#back_to_classes{
+    width: 240px;
+    height: 100px;
+    background: red;
+    border: 2px solid black;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: black;
+    font-size: 1.4rem;
+}
+#back_to_classes:hover{
+    background: rgb(247, 160, 31);
 }
 
 /* #class2{
