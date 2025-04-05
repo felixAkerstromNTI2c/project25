@@ -97,6 +97,20 @@ post('/class_members/create') do
   redirect("/classes/show/#{group_id}")
 end
 
+post('/class_members/:id/delete') do
+  member_id = params[:id]
+  group_id = params[:group_id] # Pass the group ID to redirect back to the correct class
+  db = get_db()
+  
+  # Delete the member from the group_members table
+  db.execute("DELETE FROM group_members WHERE member_id = ?", [member_id])
+
+  redirect("/classes/show/#{group_id}")
+end
+
+post('/class_members/delete') do
+end
+
 post('/login') do
   username = params[:username]
   password = params[:password]
