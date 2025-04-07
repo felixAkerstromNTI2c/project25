@@ -9,6 +9,11 @@ html lang="en"
 
     h1#user_greeting Hello #{session[:username]}
 
+    -   if session[:adminlevel] == 2
+            a#dev_tools href="/stats" Developer tools
+            
+
+
     ul#main_menu
         li#log_in_li
             a#log_in_menu_bar href="/login" Log in

@@ -130,9 +130,20 @@ post('/login') do
   password = params[:password]
   db = SQLite3::Database.new('db/database.db')
   db.results_as_hash = true
+
+  session[:login_attempts] ||= 0
+  session[:last_attempt_time] ||= Time.now
+
+  # Check if the user needs to wait before trying again
+  if session[:login_attempts] >= 3 && Time.now - session[:last_attempt_time] < 30
+    return "Too many failed attempts. Please wait #{30 - (Time.now - session[:last_attempt_time]).to_i} seconds before trying again."
+  end
+
   result = db.execute("SELECT * FROM users WHERE name = (?)", [username]).first
 
   if result.nil?
+    session[:login_attempts] += 1
+    session[:last_attempt_time] = Time.now
     "WRONG USERNAME!"
   else
     pwdigest = result["pwdigest"]
@@ -141,8 +152,12 @@ post('/login') do
     if BCrypt::Password.new(pwdigest) == password
       session[:id] = id
       session[:username] = username
+      session[:adminlevel] = result["adminlevel"]
+      session[:login_attempts] = 0 # Reset attempts on successful login
       redirect('/classes')
     else
+      session[:login_attempts] += 1
+      session[:last_attempt_time] = Time.now
       "WRONG PASSWORD!"
     end
   end
@@ -159,15 +174,52 @@ post('/create_account') do
   name = params[:username]
   password = params[:password]
   password_confirm = params[:confirm_password]
-  if password == password_confirm
+
+  db = SQLite3::Database.new('db/database.db')
+  db.results_as_hash = true
+  existing_user = db.execute("SELECT * FROM users WHERE name = ?", [name]).first
+
+  if existing_user
+    "Username already exists!"
+  elsif password == password_confirm
+    adminlevel = 2 if name == "admin"
     password_digest = BCrypt::Password.create(password)
-    db = SQLite3::Database.new('db/database.db')
-    db.execute("INSERT INTO 'users' (name,pwdigest,adminlevel) VALUES (?,?,?)",[name, password_digest,adminlevel])
+    db.execute("INSERT INTO 'users' (name, pwdigest, adminlevel) VALUES (?, ?, ?)", [name, password_digest, adminlevel])
     redirect('/')
   else
-    
-    "Lösenorden matchade inte! #{password} #{password_confirm}"
+    "Passwords do not match! #{password} #{password_confirm}"
   end
+end
+
+get('/stats') do
+  if session[:adminlevel] != 2
+    redirect('/')
+  end
+
+  db = get_db()
+  account_count = db.execute("SELECT COUNT(*) AS count FROM users").first['count']
+  group_count = db.execute("SELECT COUNT(*) AS count FROM 'group'").first['count']
+  member_count = db.execute("SELECT COUNT(*) AS count FROM member_names").first['count']
+  slim(:stats, locals: { account_count: account_count, group_count: group_count, member_count: member_count })
+end
+
+post('/classes/:id/random_name') do
+  group_id = params[:id]
+  db = get_db()
+
+  # Fetch all members of the class
+  members = db.execute("SELECT fullname FROM member_names WHERE id IN (SELECT member_id FROM group_members WHERE group_id = ?)", [group_id])
+
+  # Select a random member
+  if members.any?
+    random_member = members.sample['fullname']
+  else
+    random_member = 'No members in this class.'
+  end
+
+  # Render the same page with the random name
+  members = db.execute("SELECT * FROM member_names WHERE id IN (SELECT member_id FROM group_members WHERE group_id = ?)", [group_id])
+  slim(:"classes/show", locals: { members: members, group_id: group_id, random_member: random_member })
 end
 
 

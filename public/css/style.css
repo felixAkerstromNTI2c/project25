@@ -139,7 +139,7 @@
 }
 .member_icon{
     width: 240px;
-    height: 30px;
+    height: 35px;
     background: rgb(80, 170, 140);
     border: 2px solid black;
     box-sizing: border-box;
@@ -244,5 +244,70 @@
 }
 
 #account_button:hover{
+    background: rgb(80, 170, 140);
+}
+
+#delete_member_button{
+    width: 240px;
+    height:20px;
+    background: red;
+    border: 2px solid black;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: black;
+    font-size: 1.2rem;
+}
+#delete_member_button:hover{
+    background: rgb(247, 160, 31);
+}
+#delete_class_button{
+    background: red;
+    border: 2px solid black;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: black;
+    font-size: 1.4rem;
+}
+#delete_class_button:hover{
+    background: rgb(247, 160, 31);
+}
+
+#dev_tools{
+    background: rgb(89, 202, 164);
+    grid-area: dev;
+    display:flex;
+    justify-content:center;
+    align-items: center;
+    width: 150px;
+    height:70px;
+    text-decoration: none;
+    color: black;
+
+}
+
+#random_name_button{
+    background: teal;
+    margin-top: 15px;
+    grid-area: random_name;
+    display:flex;
+    justify-content:center;
+    align-items: center;
+    width: 150px;
+    height:70px;
+    text-decoration: none;
+    color: black;
+
+}
+#random_name_button:hover{
     background: rgb(80, 170, 140);
 }

@@ -7,13 +7,19 @@ div#grid_wrapper_members
         p.member_icon = member['fullname']
         form action="/class_members/#{member['id']}/delete" method="POST"
             input type="hidden" name="group_id" value=group_id
-            button type="submit" Delete
+            button#delete_member_button type="submit" Remove 
           
-    form action="/class_members/create" method="post"
+    form action="/class_members/create" method="POST"
         input type="text" name="fullname" placeholder="The name"
         input type="hidden" name="group_id" value=group_id
         input type="submit" value="Add member"
+    
+    form action="/classes/#{group_id}/random_name" method="POST"
+        button#random_name_button type="submit" Choose Random Name
 
-    form action="/classes/#{group_id}/delete" method="post"
-        button type="submit" Delete Class
+    - if defined?(random_member)
+        p#random_name_result Random Name: #{random_member}
+
+    form action="/classes/#{group_id}/delete" method="POST"
+        button#delete_class_button type="submit" Delete Class
         
