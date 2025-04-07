@@ -13,4 +13,7 @@ div#grid_wrapper_members
         input type="text" name="fullname" placeholder="The name"
         input type="hidden" name="group_id" value=group_id
         input type="submit" value="Add member"
+
+    form action="/classes/#{group_id}/delete" method="post"
+        button type="submit" Delete Class
         

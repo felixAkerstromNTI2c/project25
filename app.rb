@@ -108,8 +108,22 @@ post('/class_members/:id/delete') do
   redirect("/classes/show/#{group_id}")
 end
 
-post('/class_members/delete') do
+post('/classes/:id/delete') do
+  group_id = params[:id]
+  db = get_db()
+
+  # Delete all relationships in the group_members table
+  db.execute("DELETE FROM group_members WHERE group_id = ?", [group_id])
+
+  # Optionally, delete all members associated with the group
+  db.execute("DELETE FROM member_names WHERE id IN (SELECT member_id FROM group_members WHERE group_id = ?)", [group_id])
+
+  # Delete the class itself
+  db.execute("DELETE FROM 'group' WHERE id = ?", [group_id])
+
+  redirect('/classes')
 end
+
 
 post('/login') do
   username = params[:username]
