@@ -3,14 +3,11 @@ require 'slim'
 require 'sqlite3'
 require 'sinatra/reloader'
 require 'bcrypt'
+require_relative 'model/model.rb'
+also_reload 'model/model.rb'
 
 enable :sessions
 
-def get_db()
-  db = SQLite3::Database.new("db/database.db")
-  db.results_as_hash = true
-  return db
-end
 
 get('/') do
     slim(:start)
@@ -25,30 +22,23 @@ get('/login') do
 end
 
 get('/classes') do
-  db = get_db()
-	
-	groups = db.execute("SELECT * FROM 'group' WHERE userid = #{session[:id]}")
+  session_id = session[:id]
 
+	groups = show_classes(session_id)
   slim(:"classes/index", locals:{groups:groups})
 end
 
 get('/classes/show/:id') do
   group_id = params[:id]
-  db = get_db()
-  
-  members = db.execute("SELECT * FROM 'member_names' WHERE id IN (SELECT member_id FROM 'group_members' WHERE group_id = ?)", [group_id])
+  members = show_class_members(group_id)
   slim(:"classes/show", locals: {members: members, group_id: group_id})
 end
 
 get('/class_members') do
+  session_id = session[:id]
   db = get_db()
   
-  members = db.execute("
-    SELECT group.groupname, member_names.fullname
-    FROM group_members
-    INNER JOIN 'group' ON group_members.group_id = group.id
-    INNER JOIN member_names ON group_members.member_id = member_names.id
-    WHERE group.userid = ?", [session[:id]])
+  members = inner_join_members(session_id) 
   slim(:"class_members/index", locals: { members: members })
   #members = db.execute("SELECT * FROM 'member_names'") # Realtionstabellen mellan grupper och medlemmar är inte implementerad i databasen än.
   # members = db.execute("SELECT * FROM 'member_names' INNER JOIN 'group' ON member_names.id = group.id WHERE group.userid = #{session[:id]}")
@@ -63,64 +53,37 @@ get('/classes/edit') do
   slim(:"classes/edit")
 end
 
-get('/class_members/show/:id') do
-
-end
-
 post('/classes/create') do
 	userid = session[:id]
 	groupname = params[:groupname]
-	db = get_db()
-	db.execute("INSERT INTO 'group' (groupname, userid) VALUES (?,?)", [groupname,userid])
+	create_class(userid, groupname)
 	redirect('/classes')
 end
 
 get('/class_members/new') do
   db = get_db()
-  
-  groups = db.execute("SELECT * FROM 'group' WHERE userid = #{session[:id]}")
+  session_id =session[:id]
+  groups = add_class_member_get(session_id)
   slim(:"class_members/new", locals:{groups:groups})
 end
 
 post('/class_members/create') do
   group_id = params[:group_id]
-  # member_id = params[:memberid]
   fullname = params[:fullname]
-  # id = params[:groupid]
-  db = get_db()
-  db.execute("INSERT INTO 'member_names' (fullname) VALUES (?)", [fullname])
-  # Get the last inserted class_member_id
-  member_id = db.last_insert_row_id
-
-  # Insert the relationship into the junction table
-  db.execute("INSERT INTO group_members (group_id, member_id) VALUES (?, ?)", [group_id, member_id])
+  add_class_member_post(group_id, fullname)
   redirect("/classes/show/#{group_id}")
 end
 
 post('/class_members/:id/delete') do
   member_id = params[:id]
-  group_id = params[:group_id] # Pass the group ID to redirect back to the correct class
-  db = get_db()
-  
-  # Delete the member from the group_members table
-  db.execute("DELETE FROM group_members WHERE member_id = ?", [member_id])
-
+  group_id = params[:group_id] 
+  delete_class_member(member_id)
   redirect("/classes/show/#{group_id}")
 end
 
 post('/classes/:id/delete') do
   group_id = params[:id]
-  db = get_db()
-
-  # Delete all relationships in the group_members table
-  db.execute("DELETE FROM group_members WHERE group_id = ?", [group_id])
-
-  # Optionally, delete all members associated with the group
-  db.execute("DELETE FROM member_names WHERE id IN (SELECT member_id FROM group_members WHERE group_id = ?)", [group_id])
-
-  # Delete the class itself
-  db.execute("DELETE FROM 'group' WHERE id = ?", [group_id])
-
+  delete_class(group_id)
   redirect('/classes')
 end
 
@@ -195,20 +158,17 @@ get('/stats') do
   if session[:adminlevel] != 2
     redirect('/')
   end
-
-  db = get_db()
-  account_count = db.execute("SELECT COUNT(*) AS count FROM users").first['count']
-  group_count = db.execute("SELECT COUNT(*) AS count FROM 'group'").first['count']
-  member_count = db.execute("SELECT COUNT(*) AS count FROM member_names").first['count']
+  account_count = get_amount_of_users() # db.execute("SELECT COUNT(*) AS count FROM users").first['count']
+  group_count = get_amount_of_groups() # db.execute("SELECT COUNT(*) AS count FROM 'group'").first['count']
+  member_count = get_amount_of_members() #db.execute("SELECT COUNT(*) AS count FROM member_names").first['count']
   slim(:stats, locals: { account_count: account_count, group_count: group_count, member_count: member_count })
 end
 
 post('/classes/:id/random_name') do
   group_id = params[:id]
   db = get_db()
-
   # Fetch all members of the class
-  members = db.execute("SELECT fullname FROM member_names WHERE id IN (SELECT member_id FROM group_members WHERE group_id = ?)", [group_id])
+  members = select_members(group_id) 
 
   # Select a random member
   if members.any?
@@ -218,17 +178,10 @@ post('/classes/:id/random_name') do
   end
 
   # Render the same page with the random name
-  members = db.execute("SELECT * FROM member_names WHERE id IN (SELECT member_id FROM group_members WHERE group_id = ?)", [group_id])
+  members = render_members(group_id)
   slim(:"classes/show", locals: { members: members, group_id: group_id, random_member: random_member })
 end
 
-
-
-get('/group/:id') do
-
-
-
-end
 
 
 

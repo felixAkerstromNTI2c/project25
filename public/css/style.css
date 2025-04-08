@@ -266,6 +266,8 @@
     background: rgb(247, 160, 31);
 }
 #delete_class_button{
+    width: 240px;
+    height: 50px;
     background: red;
     border: 2px solid black;
     box-sizing: border-box;
@@ -296,14 +298,14 @@
 }
 
 #random_name_button{
+    width: 240px;
+    height: 50px;
     background: teal;
+    margin: 2px;
     margin-top: 15px;
-    grid-area: random_name;
     display:flex;
     justify-content:center;
     align-items: center;
-    width: 150px;
-    height:70px;
     text-decoration: none;
     color: black;
 
