@@ -1,13 +1,50 @@
 module Model
-
-    # Opens a connection to the SQLite3 database
-    #
-    # @return [SQLite3::Database] the database connection
+    
     def get_db()
       db = SQLite3::Database.new("db/database.db")
       db.results_as_hash = true
       return db
     end
+
+    def before()
+      if session[:id].nil?
+        return false
+      else
+        return true
+      end
+    end
+
+    def authorize_group_owner(group_id)
+      db = get_db()
+      result = db.execute("SELECT userid FROM 'group' WHERE id = ?", [group_id]).first
+      return result && result['userid'] == session[:id]
+    end
+
+    def authorize_member_owner(member_id)
+      return false if session[:id].nil?
+      puts"Authorizing member owner with ID: #{member_id}"
+
+      db = get_db()
+      result = db.execute("
+        SELECT \"group\".userid
+        FROM group_members
+        INNER JOIN \"group\" ON group_members.group_id = \"group\".id
+        WHERE group_members.member_id = ?", [member_id]).first
+      return result && result['userid'] == session[:id]
+    end
+
+    # result = db.execute("
+    #   SELECT group.userid
+    #   FROM group_members
+    #   INNER JOIN 'group' ON group_members.group_id = group.id
+    #   INNER JOIN member_names ON group_members.member_id = member_names.id
+    #   WHERE member_names.id = ?", [member_id]).first
+    #   return result && result['userid'] == session[:id]
+
+    # Opens a connection to the SQLite3 database
+    #
+    # @return [SQLite3::Database] the database connection
+    
   
     # Retrieves all classes for a given user
     #

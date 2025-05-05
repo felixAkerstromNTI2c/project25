@@ -9,6 +9,14 @@ include Model
 
 enable :sessions
 
+before do
+  # Skip login check for these routes
+  pass if ['/', '/login', '/create_account', '/logout'].include?(request.path_info)
+
+  # Redirect to login if the user is not logged in
+  redirect('/login') unless session[:id]
+end
+
 # Displays the start page
 get('/') do
     slim(:start)
@@ -29,7 +37,6 @@ end
 # @see Model#show_classes
 get('/classes') do
   session_id = session[:id]
-
 	groups = show_classes(session_id)
   slim(:"classes/index", locals:{groups:groups})
 end
@@ -39,9 +46,9 @@ end
 # @param [Integer] :id, the ID of the class
 # @see Model#show_class_members
 get('/classes/show/:id') do
-  group_id = params[:id]
-  members = show_class_members(group_id)
-  slim(:"classes/show", locals: {members: members, group_id: group_id})
+    group_id = params[:id]
+    members = show_class_members(group_id)
+    slim(:"classes/show", locals: {members: members, group_id: group_id})
 end
 
 # Displays class members using an inner join with current user’s classes
@@ -50,7 +57,6 @@ end
 get('/class_members') do
   session_id = session[:id]
   db = get_db()
-  
   members = inner_join_members(session_id) 
   slim(:"class_members/index", locals: { members: members })
 end
@@ -65,20 +71,23 @@ end
 #
 # @see Model#create_class
 post('/classes/create') do
-	userid = session[:id]
-	groupname = params[:groupname]
-	create_class(userid, groupname)
-	redirect('/classes')
+  userid = session[:id]
+  groupname = params[:groupname]
+  if groupname.strip.empty? 
+    return "Fill In fields"
+  end
+  create_class(userid, groupname)
+  redirect('/classes')
 end
 
 # Displays form for adding a new class member
 #
 # @see Model#add_class_member_get
 get('/class_members/new') do
-  db = get_db()
-  session_id =session[:id]
-  groups = add_class_member_get(session_id)
-  slim(:"class_members/new", locals:{groups:groups})
+    db = get_db()
+    session_id =session[:id]
+    groups = add_class_member_get(session_id)
+    slim(:"class_members/new", locals:{groups:groups})
 end
 
 # Handles creation of a new class member
@@ -87,10 +96,15 @@ end
 # @param [String] :fullname, the name of the new member
 # @see Model#add_class_member_post
 post('/class_members/create') do
-  group_id = params[:group_id]
-  fullname = params[:fullname]
-  add_class_member_post(group_id, fullname)
-  redirect("/classes/show/#{group_id}")
+    group_id = params[:group_id]
+    fullname = params[:fullname]
+
+    if fullname.strip.empty?
+      return "Fill In fields"
+    end
+
+    add_class_member_post(group_id, fullname)
+    redirect("/classes/show/#{group_id}")
 end
 
 # Deletes a class member
@@ -99,8 +113,10 @@ end
 # @param [Integer] :group_id, the ID of the group the member belongs to
 # @see Model#delete_class_member
 post('/class_members/:id/delete') do
-  member_id = params[:id]
+  member_id = params[:id].to_i
   group_id = params[:group_id] 
+  halt(403, "Unauthorized") unless authorize_member_owner(member_id)
+  member_id = params[:id]
   delete_class_member(member_id)
   redirect("/classes/show/#{group_id}")
 end
@@ -110,6 +126,8 @@ end
 # @param [Integer] :id, the ID of the class
 # @see Model#delete_class
 post('/classes/:id/delete') do
+  group_id = params[:id].to_i
+  halt(403, "Unauthorized") unless authorize_group_owner(group_id)
   group_id = params[:id]
   delete_class(group_id)
   redirect('/classes')
@@ -175,6 +193,10 @@ post('/create_account') do
   name = params[:username]
   password = params[:password]
   password_confirm = params[:confirm_password]
+
+  if name.strip.empty? || password.strip.empty? || password_confirm.strip.empty?
+    return "Fill In fields"
+  end
 
   db = get_db()
   existing_user = select_names(name)
