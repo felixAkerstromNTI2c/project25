@@ -33,14 +33,6 @@ module Model
       return result && result['userid'] == session[:id]
     end
 
-    # result = db.execute("
-    #   SELECT group.userid
-    #   FROM group_members
-    #   INNER JOIN 'group' ON group_members.group_id = group.id
-    #   INNER JOIN member_names ON group_members.member_id = member_names.id
-    #   WHERE member_names.id = ?", [member_id]).first
-    #   return result && result['userid'] == session[:id]
-
     # Opens a connection to the SQLite3 database
     #
     # @return [SQLite3::Database] the database connection

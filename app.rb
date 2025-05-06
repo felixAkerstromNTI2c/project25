@@ -99,6 +99,8 @@ post('/class_members/create') do
     group_id = params[:group_id]
     fullname = params[:fullname]
 
+    halt(403, "Unauthorized") unless authorize_group_owner(group_id)
+
     if fullname.strip.empty?
       return "Fill In fields"
     end
